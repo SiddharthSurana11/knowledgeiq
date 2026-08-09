@@ -1,0 +1,152 @@
+{
+  "timestamp": "2026-08-05T21:56:07.212438",
+  "api_url": "http://localhost:5000",
+  "summary": {
+    "recall_at_5": {
+      "correct": 2,
+      "total": 2,
+      "rate": 1.0
+    },
+    "supersession_accuracy": {
+      "correct": 0,
+      "total": 0,
+      "rate": 0.0
+    },
+    "abstention_correctness": {
+      "correct": 2,
+      "total": 2,
+      "rate": 1.0
+    },
+    "faithfulness_proxy": {
+      "correct": 2,
+      "total": 2,
+      "rate": 1.0
+    },
+    "total_queries": 9,
+    "successful_queries": 4,
+    "error_queries": 5,
+    "avg_latency_ms": 5577.0,
+    "p95_latency_ms": 9592
+  },
+  "per_query_results": [
+    {
+      "id": "eval_01",
+      "query": "What is Akshay Surana's professional experience in private equity and partnership tax compliance?",
+      "test_type": "standard",
+      "status": "ok",
+      "latency_ms": 4392,
+      "recall_at_5": true,
+      "supersession_correct": null,
+      "abstention_correct": null,
+      "faithfulness_correct": true,
+      "is_refusal": true,
+      "top_doc_id": "c5711327-4358-4ef6-9fdc-b101d359fb01",
+      "top_confidence": 58,
+      "reply_preview": "**Akshay Surana's Professional Experience**\n\n**Key Points**\n\u2022 Akshay Surana has extensive experience in private equity and partnership tax compliance,...",
+      "doc_hits_count": 5
+    },
+    {
+      "id": "eval_02",
+      "query": "Who approved the TriageLogic company policy and procedure manual?",
+      "test_type": "standard",
+      "status": "error",
+      "latency_ms": 11131,
+      "recall_at_5": false,
+      "supersession_correct": null,
+      "abstention_correct": null,
+      "faithfulness_correct": null
+    },
+    {
+      "id": "eval_03",
+      "query": "What email alias can Microsoft employees use to contact business conduct and compliance for advice?",
+      "test_type": "standard",
+      "status": "ok",
+      "latency_ms": 9592,
+      "recall_at_5": true,
+      "supersession_correct": null,
+      "abstention_correct": null,
+      "faithfulness_correct": true,
+      "is_refusal": false,
+      "top_doc_id": "cced4291-6a37-4aed-8087-4e6cb85caa69",
+      "top_confidence": 56,
+      "reply_preview": "**Microsoft employees can contact business conduct and compliance for advice by emailing buscondmicrosoftcom.**\n\n**Key Points**\n\u2022 Employees can email ...",
+      "doc_hits_count": 5
+    },
+    {
+      "id": "eval_04",
+      "query": "What are Microsoft's requirements regarding business records and documentation for suppliers?",
+      "test_type": "standard",
+      "status": "error",
+      "latency_ms": 10526,
+      "recall_at_5": false,
+      "supersession_correct": null,
+      "abstention_correct": null,
+      "faithfulness_correct": null
+    },
+    {
+      "id": "eval_05",
+      "query": "What open standards does Microsoft invest in to address deceptive AI content and deepfakes?",
+      "test_type": "standard",
+      "status": "error",
+      "latency_ms": 10487,
+      "recall_at_5": false,
+      "supersession_correct": null,
+      "abstention_correct": null,
+      "faithfulness_correct": null
+    },
+    {
+      "id": "eval_06",
+      "query": "What is Microsoft's lifetime water replenishment volume target reported in their environmental sustainability report?",
+      "test_type": "supersession",
+      "status": "error",
+      "latency_ms": 5699,
+      "recall_at_5": false,
+      "supersession_correct": null,
+      "abstention_correct": null,
+      "faithfulness_correct": null
+    },
+    {
+      "id": "eval_07",
+      "query": "Who are the authors of The Security Development Lifecycle book published by Microsoft Press?",
+      "test_type": "standard",
+      "status": "error",
+      "latency_ms": 9829,
+      "recall_at_5": false,
+      "supersession_correct": null,
+      "abstention_correct": null,
+      "faithfulness_correct": null
+    },
+    {
+      "id": "eval_08",
+      "query": "What are the step-by-step instructions for baking a traditional Italian Neapolitan pizza?",
+      "test_type": "no_answer_expected",
+      "status": "ok",
+      "latency_ms": 4057,
+      "recall_at_5": false,
+      "supersession_correct": null,
+      "abstention_correct": true,
+      "faithfulness_correct": null,
+      "is_refusal": true,
+      "top_doc_id": "962b67e9-e2f7-4a7a-8ca3-c365e278191f",
+      "top_confidence": 16,
+      "reply_preview": "**Traditional Italian Neapolitan Pizza Baking Instructions**\n\n**Key Points**\n\u2022 Preheat the oven to 500-600\u00b0F (260-315\u00b0C) with a pizza stone inside, if...",
+      "doc_hits_count": 5
+    },
+    {
+      "id": "eval_09",
+      "query": "What are the orbital characteristics and atmospheric composition of Jupiter's moon Europa?",
+      "test_type": "no_answer_expected",
+      "status": "ok",
+      "latency_ms": 4267,
+      "recall_at_5": false,
+      "supersession_correct": null,
+      "abstention_correct": true,
+      "faithfulness_correct": null,
+      "is_refusal": true,
+      "top_doc_id": "c524649c-6cd3-477a-9966-8cba40a00ed2",
+      "top_confidence": 19,
+      "reply_preview": "**Orbital Characteristics and Atmospheric Composition of Europa**\n\n**Key Points**\n\u2022 Europa has a highly eccentric orbit with an orbital period of appr...",
+      "doc_hits_count": 5
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+OUTPUT FORMAT CONTRACT
+Inside <answer>...</answer>, use this exact structure:
+
+**[One-line headline answer]**
+
+**Key Points**
+• [Complete synthesized sentence]
+• [Complete synthesized sentence]
+
+**What's not covered** (include ONLY if there is a specific gap in evidence)
+
+Rules:
+- 2 to 5 bullets maximum. Each bullet must be a complete sentence.
+- Always include key numbers, total years of experience, and specific quantitative metrics present in the evidence.
+- Preserve numerical ranges, decimals, and hyphens accurately (e.g., write "5-6 years" or "5.6 years", never omit punctuation to alter figures).
+- Never start the headline with "Based on..." or "According to...".

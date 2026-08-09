@@ -1,0 +1,83 @@
+[
+  {
+    "id": "eval_01",
+    "query": "What is Akshay Surana's professional experience in private equity and partnership tax compliance?",
+    "expected_documentId": "c5711327-4358-4ef6-9fdc-b101d359fb01",
+    "expected_answer_contains": "private equity and partnership tax compliance",
+    "category": "hr",
+    "test_type": "standard",
+    "source_excerpt": "dynamic us tax senior professional with 5-6 years of expertise in private equity fund of funds and reit taxation skilled in managing complex federal and state tax compliance"
+  },
+  {
+    "id": "eval_02",
+    "query": "Who approved the TriageLogic company policy and procedure manual?",
+    "expected_documentId": "b305c43e-2527-4a73-830e-38d250253b2a",
+    "expected_answer_contains": "approved by charu g raheja phd chairceo triagelogic",
+    "category": "hr",
+    "test_type": "standard",
+    "source_excerpt": "company policy and procedure manual triagelogic llc initial version november 2013 last update june 4 2018 version 60 approved by charu g raheja phd chairceo triagelogic ll"
+  },
+  {
+    "id": "eval_03",
+    "query": "What email alias can Microsoft employees use to contact business conduct and compliance for advice?",
+    "expected_documentId": "cced4291-6a37-4aed-8087-4e6cb85caa69",
+    "expected_answer_contains": "email the business conduct and compliance alias buscondmicrosoftcom for advice",
+    "category": "hr",
+    "test_type": "standard",
+    "source_excerpt": "or are not sure whether you can or should resolve the issue yourself you can always email the business conduct and compliance alias buscondmicrosoftcom for advice"
+  },
+  {
+    "id": "eval_04",
+    "query": "What are Microsoft's requirements regarding business records and documentation for suppliers?",
+    "expected_documentId": "962b67e9-e2f7-4a7a-8ca3-c365e278191f",
+    "expected_answer_contains": "Accurate and transparent documentation of all services is important",
+    "category": "compliance",
+    "test_type": "standard",
+    "source_excerpt": "Do not conceal or misrepresent services performed for Microsoft. Accurate and transparent documentation of all services is important."
+  },
+  {
+    "id": "eval_05",
+    "query": "What open standards does Microsoft invest in to address deceptive AI content and deepfakes?",
+    "expected_documentId": "34bf4db0-95fb-4bbb-bb1b-70fdbbb5e109",
+    "expected_answer_contains": "we invest in open standards like c2pa",
+    "category": "it",
+    "test_type": "standard",
+    "source_excerpt": "we recognize that we need to take a wholeofsociety approach to address the risk of bad actors using ai and deepfakes to deceive the public this is why we invest in open standards like c2pa"
+  },
+  {
+    "id": "eval_06",
+    "query": "What is Microsoft's lifetime water replenishment volume target reported in their environmental sustainability report?",
+    "expected_documentId": "c524649c-6cd3-477a-9966-8cba40a00ed2",
+    "expected_answer_contains": "133 million cubic meters of replenishment volume over their lifetime",
+    "category": "compliance",
+    "test_type": "supersession",
+    "source_excerpt": "more than 133 million cubic meters of replenishment volume over their lifetime the equivalent of 53200 olympicsized swimming pools"
+  },
+  {
+    "id": "eval_07",
+    "query": "Who are the authors of The Security Development Lifecycle book published by Microsoft Press?",
+    "expected_documentId": "0eb4d64f-a4cc-405f-95e5-93d4d85d3d7b",
+    "expected_answer_contains": "michael howard and steve lipner",
+    "category": "business_operations",
+    "test_type": "standard",
+    "source_excerpt": "the security development lifecycle michael howard and steve lipner foreword by jim allchin copresident platforms services division microsoft corporation"
+  },
+  {
+    "id": "eval_08",
+    "query": "What are the step-by-step instructions for baking a traditional Italian Neapolitan pizza?",
+    "expected_documentId": null,
+    "expected_answer_contains": null,
+    "category": null,
+    "test_type": "no_answer_expected",
+    "source_excerpt": "N/A - Out-of-domain query. None of the corporate documents cover culinary topics or pizza recipes."
+  },
+  {
+    "id": "eval_09",
+    "query": "What are the orbital characteristics and atmospheric composition of Jupiter's moon Europa?",
+    "expected_documentId": null,
+    "expected_answer_contains": null,
+    "category": null,
+    "test_type": "no_answer_expected",
+    "source_excerpt": "N/A - Out-of-domain query. None of the corporate documents cover astrophysics or space exploration."
+  }
+]

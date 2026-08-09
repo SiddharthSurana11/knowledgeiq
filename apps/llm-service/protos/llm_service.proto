@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+service LLMService {
+  rpc GenerateResponse (GenerateResponseRequest) returns (GenerateResponseReply);
+  rpc AnalyzeContent (AnalyzeContentRequest) returns (AnalyzeContentReply);
+}
+
+message RetrievedChunk {
+  float score = 1;
+  string text = 2;
+  string category = 3;
+  string filename = 4;
+  string page = 5;
+  int32 chunk_index = 6;
+  string document_id = 7;
+}
+
+message GenerateResponseRequest {
+  string user_query = 1;
+  repeated RetrievedChunk retrieved_content = 2;
+  string memory_block = 3;
+  bool is_refusal = 4;
+}
+
+message GenerateResponseReply {
+  string answer = 1;
+  string follow_up = 2;
+  repeated string document_hits = 3;
+  string resource_type = 4;
+  string telemetry_json = 5;
+}
+
+message AnalyzeContentRequest {
+  string system_prompt = 1;
+  string content = 2;
+  string task_type = 3;
+}
+
+message AnalyzeContentReply {
+  string result = 1;
+  string telemetry_json = 2;
+}

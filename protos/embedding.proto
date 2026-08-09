@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package embedding;
+
+// --------- Existing definitions ---------
+message HandleUploadRequest {
+  string temp_path = 1;
+  string category = 2;
+  string original_name = 3;
+}
+message HandleUploadResponse {
+  string status = 1;
+  string final_path = 2;
+  string message = 3;
+}
+
+// --------- Live embedding ---------
+message GetEmbeddingRequest {
+  string text = 1; // The text to embed (user query)
+}
+message GetEmbeddingResponse {
+  repeated float vector = 1; // The embedding array
+}
+
+// --------- Cross-encoder reranking ---------
+message RerankRequest {
+  string query = 1;
+  repeated string candidate_texts = 2;
+}
+message RerankResponse {
+  repeated float scores = 1; // One score per candidate_text, same order
+}
+
+// --------- RPCs ---------
+service EmbeddingService {
+  rpc HandleUpload(HandleUploadRequest) returns (HandleUploadResponse);
+  rpc GetEmbedding(GetEmbeddingRequest) returns (GetEmbeddingResponse);
+  rpc RerankCandidates(RerankRequest) returns (RerankResponse);
+}

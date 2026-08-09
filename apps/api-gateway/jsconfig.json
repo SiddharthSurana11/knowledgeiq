@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",   // root is backend/
+    "paths": {
+      "@routes/*": ["routes/*"],
+      "@utils/*": ["utils/*"],
+      "@uploads/*": ["uploads/*"],
+      "@logs/*": ["logs/*"]
+    },
+    "module": "commonjs",
+    "target": "ES2020"
+  },
+  "include": ["."]
+}

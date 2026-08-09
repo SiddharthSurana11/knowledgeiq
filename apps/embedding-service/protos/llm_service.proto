@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+service LLMService {
+  rpc GenerateResponse (GenerateResponseRequest) returns (GenerateResponseReply);
+}
+
+message RetrievedChunk {
+  float score = 1;
+  string text = 2;
+  string category = 3;
+  string filename = 4;
+}
+
+message GenerateResponseRequest {
+  string user_query = 1;
+  repeated RetrievedChunk retrieved_content = 2;
+  string memory_block = 3;
+}
+
+message GenerateResponseReply {
+  string answer = 1;
+  string follow_up = 2;
+  repeated string document_hits = 3;
+  string resource_type = 4;
+}

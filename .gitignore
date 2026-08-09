@@ -1,0 +1,44 @@
+# Environment variables and secrets
+.env
+/*.env
+**/.env
+*.env.local
+*.env.production
+.env.*.local
+*.env.*.local
+!/.env.example
+!**/.env.example
+
+# Credentials
+**/keys/*.json
+**/keys/
+
+# Python
+**/venv/
+**/.venv/
+**/pycache/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Node
+**/node_modules/
+.vite/
+**/.vite/
+
+# Sensitive/local-only data
+Dataset/
+
+# Logs
+**/logs/
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Build/coverage outputs
+**/dist/
+coverage/

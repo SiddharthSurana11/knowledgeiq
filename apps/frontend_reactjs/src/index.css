@@ -1,0 +1,31 @@
+/* index.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-charcoal-1000 text-charcoal-50 font-sans antialiased selection:bg-teal-500/30 selection:text-teal-100;
+  }
+}
+
+/* Custom anchor styles */
+a {
+  @apply font-medium text-teal-400 hover:text-teal-300 transition-colors;
+}
+
+/* Custom Scrollbar for a premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-charcoal-700 rounded-full hover:bg-charcoal-600 border-2 border-transparent bg-clip-content;
+}

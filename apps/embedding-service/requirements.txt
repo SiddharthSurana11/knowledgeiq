@@ -1,0 +1,30 @@
+# Core ML / Embeddings
+numpy
+sentence-transformers
+tiktoken
+
+# Document Extraction
+PyMuPDF              # provides 'import fitz'
+python-docx          # for .docx
+python-pptx          # for .pptx
+pytesseract          # OCR
+
+# NLP
+spacy
+nltk
+
+# Vector DB
+pinecone             # new SDK: 'from pinecone import Pinecone, ServerlessSpec'
+
+# Scheduler
+apscheduler
+
+# Environment
+python-dotenv
+
+# gRPC
+grpcio>=1.73.1
+grpcio-tools>=1.73.1
+
+# MongoDB
+pymongo
