@@ -3,6 +3,7 @@ import { Send, Settings2, Loader2 } from 'lucide-react';
 import ChatMessage from './ChatMessage';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import logoImg from '../assets/transparent_bg_wolf_2.png';
 
 export default function ChatBox({ sessionId, isProcessing, searchScope, filterCategory, filterDocumentId, apiGateway, onSessionCreated, onRenameSession }) {
   const [message, setMessage] = useState('');
@@ -201,9 +202,17 @@ export default function ChatBox({ sessionId, isProcessing, searchScope, filterCa
             <Send size={16} className={message.trim() ? "translate-x-0.5" : ""} />
           </Button>
         </div>
-        <div className="text-center mt-3 text-[11px] text-charcoal-500 font-medium">
-          KnowledgeIQ can make mistakes. Consider verifying important information.
-        </div>
+        <footer className="text-center mt-3 flex flex-col items-center justify-center gap-1">
+          <div className="flex items-center justify-center gap-1.5 text-[11px] text-charcoal-500 font-medium">
+            <div className="w-3.5 h-3.5 bg-[#E2E8F0] rounded p-0.5 flex items-center justify-center shrink-0">
+              <img src={logoImg} alt="KnowledgeIQ Logo" className="w-full h-full object-contain" />
+            </div>
+            <span>KnowledgeIQ can make mistakes. Consider verifying important information.</span>
+          </div>
+          <div className="text-[10px] text-charcoal-500/80 font-medium">
+            Built by Siddharth Surana · 2026
+          </div>
+        </footer>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { Bot, User, FileText, ChevronDown, ChevronRight, CheckCircle2, ShieldAle
 import { cn } from '../lib/utils';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
+import logoImg from '../assets/transparent_bg_wolf_2.png';
 
 export default function ChatMessage({ role, text, question, documentHits, resourceType }) {
   const isBot = role === 'bot';
@@ -30,8 +31,8 @@ export default function ChatMessage({ role, text, question, documentHits, resour
         {/* Avatar */}
         <div className="shrink-0 mt-1">
           {isBot ? (
-            <div className="w-8 h-8 rounded bg-teal-500/20 text-teal-400 flex items-center justify-center border border-teal-500/30 shadow-[0_0_15px_rgba(45,212,191,0.1)]">
-              <Bot size={18} />
+            <div className="w-8 h-8 rounded bg-[#E2E8F0] p-1 flex items-center justify-center border border-charcoal-700 shadow-2xs">
+              <img src={logoImg} alt="AI Avatar" className="w-full h-full object-contain" />
             </div>
           ) : (
             <div className="w-8 h-8 rounded bg-charcoal-800 text-charcoal-300 flex items-center justify-center border border-charcoal-700">

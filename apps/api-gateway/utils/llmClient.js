@@ -22,7 +22,7 @@ const protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
 const credentials = config.tls.grpcEnabled ? grpc.credentials.createSsl() : grpc.credentials.createInsecure();
 const client = new protoDescriptor.LLMService(LLM_GRPC_HOST, credentials);
 
-client.waitForReady(Date.now() + 5000, (err) => {
+client.waitForReady(Date.now() + 15000, (err) => {
   if (err) logger.warn('[LLMClient] gRPC LLM service not ready at startup — will attempt connection on query request');
   else logger.info('✅ gRPC LLM client connected!');
 });

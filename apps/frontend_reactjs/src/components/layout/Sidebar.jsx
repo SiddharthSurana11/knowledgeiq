@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { MessageSquare, LayoutDashboard, Settings, FileText, Plus, PenLine, Trash2, PanelLeftClose, PanelLeftOpen, ShieldCheck } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
+import logoImg from '../../assets/transparent_bg_wolf_2.png';
 
 export function Sidebar({ sessions, activeSessionId, onSessionChange, onNewSession, onRenameSession, onDeleteSession }) {
   const location = useLocation();
@@ -72,13 +73,17 @@ export function Sidebar({ sessions, activeSessionId, onSessionChange, onNewSessi
     )}>
       <div className="p-4 flex items-center justify-between border-b border-charcoal-800 h-[60px]">
         {!isCollapsed ? (
-          <h1 className="text-lg font-semibold tracking-tight text-charcoal-50 flex items-center gap-2 overflow-hidden whitespace-nowrap">
-            <div className="w-6 h-6 bg-teal-500 rounded flex items-center justify-center text-charcoal-1000 text-xs font-bold shrink-0">K</div>
+          <h1 className="text-lg font-semibold tracking-tight text-charcoal-50 flex items-center gap-2.5 overflow-hidden whitespace-nowrap">
+            <div className="w-7 h-7 bg-[#E2E8F0] rounded-md p-1 flex items-center justify-center shrink-0 shadow-2xs">
+              <img src={logoImg} alt="KnowledgeIQ Logo" className="w-full h-full object-contain" />
+            </div>
             KnowledgeIQ
           </h1>
         ) : (
           <div className="w-full flex justify-center">
-            <div className="w-6 h-6 bg-teal-500 rounded flex items-center justify-center text-charcoal-1000 text-xs font-bold shrink-0">K</div>
+            <div className="w-7 h-7 bg-[#E2E8F0] rounded-md p-1 flex items-center justify-center shrink-0 shadow-2xs">
+              <img src={logoImg} alt="KnowledgeIQ Logo" className="w-full h-full object-contain" />
+            </div>
           </div>
         )}
       </div>
