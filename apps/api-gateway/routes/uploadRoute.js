@@ -118,6 +118,14 @@ router.post('/', validate(schemas.uploadBodySchema, 'body'), upload.single('file
       });
     } catch (dupErr) {
       tempFile.removeCallback();
+      if (storageResult?.storageKey) {
+        try {
+          await storage.delete(storageResult.storageKey);
+          logger.uploadLog('Cleaned up MinIO object on duplicate check failure', { storageKey: storageResult.storageKey });
+        } catch (delErr) {
+          logger.error(`Failed to delete orphaned MinIO object ${storageResult.storageKey}: ${delErr.message}`);
+        }
+      }
       logger.error(`Duplicate detection failed: ${dupErr.message}`, dupErr);
       const err = new Error(dupErr.message || 'Document extraction failed during pre-ingestion checks.');
       err.status = dupErr.status || 422;
@@ -131,6 +139,14 @@ router.post('/', validate(schemas.uploadBodySchema, 'body'), upload.single('file
 
     if (dupDecision.duplicateStatus === 'EXACT_DUPLICATE') {
       tempFile.removeCallback();
+      if (storageResult?.storageKey) {
+        try {
+          await storage.delete(storageResult.storageKey);
+          logger.uploadLog('Cleaned up MinIO object on EXACT_DUPLICATE block', { storageKey: storageResult.storageKey });
+        } catch (delErr) {
+          logger.error(`Failed to delete orphaned MinIO object ${storageResult.storageKey}: ${delErr.message}`);
+        }
+      }
       const err = new Error(dupDecision.duplicateReason || 'Exact duplicate document ingestion blocked.');
       err.status = 409;
       return next(err);
@@ -167,6 +183,14 @@ router.post('/', validate(schemas.uploadBodySchema, 'body'), upload.single('file
       const embeddingLatency = Date.now() - embeddingStartTime;
 
       if (err || !response || response.getStatus() !== 'completed') {
+        if (storageResult?.storageKey) {
+          try {
+            await storage.delete(storageResult.storageKey);
+            logger.uploadLog('Cleaned up MinIO object on embedding failure', { storageKey: storageResult.storageKey });
+          } catch (delErr) {
+            logger.error(`Failed to delete orphaned MinIO object ${storageResult.storageKey}: ${delErr.message}`);
+          }
+        }
         const failureReason = err ? err.message : (response ? response.getMessage() : 'Embedding processing failed');
         logger.error(`Embedding service failure: ${failureReason}`, { eventId: 'UPLOAD_FAILED', status: response ? response.getStatus() : 'grpc_error' });
         const uploadErr = new Error(failureReason || 'Document processing failed — no extractable text found.');
