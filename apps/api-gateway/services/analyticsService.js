@@ -23,18 +23,18 @@ class AnalyticsService {
     const searchMetrics = searchStats[0] || { avgResponseTime: 0, avgPineconeLatency: 0, avgLlmLatency: 0, avgTotalTokens: 0, total: 0, successful: 0 };
     const searchSuccessRate = searchMetrics.total > 0 ? Math.round((searchMetrics.successful / searchMetrics.total) * 100) : 100;
 
-    // 2. FEATURE 4: Popular Searches (Top 20)
+    // 2. FEATURE 4: Popular Searches (Top 20) — Grouped by raw user query
     const popularSearches = await db.collection('search_logs').aggregate([
-      { $group: { _id: "$query", count: { $sum: 1 } } },
+      { $group: { _id: { $ifNull: ["$rawQuery", "$query"] }, count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 20 },
       { $project: { query: "$_id", count: 1, _id: 0 } }
     ]).toArray();
 
-    // 3. FEATURE 5: Failed Searches (Top failed)
+    // 3. FEATURE 5: Failed Searches (Top failed) — Grouped by raw user query
     const failedSearches = await db.collection('search_logs').aggregate([
       { $match: { resultsReturned: 0 } },
-      { $group: { _id: "$query", count: { $sum: 1 } } },
+      { $group: { _id: { $ifNull: ["$rawQuery", "$query"] }, count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 20 },
       { $project: { query: "$_id", count: 1, _id: 0 } }

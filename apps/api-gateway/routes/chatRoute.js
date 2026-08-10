@@ -1,6 +1,6 @@
 const express = require('express');
 const { getRelevantChunks } = require('../utils/pineconeClient.js');
-const { getLLMResponse } = require('../utils/llmClient.js');
+const { getLLMResponse, rewriteQuery } = require('../utils/llmClient.js');
 const { getDB } = require('../utils/mongoClient.js');
 const logger = require('../utils/logger.js');
 const { config } = require('../config');
@@ -20,7 +20,64 @@ router.post('/', validate(schemas.chatSchema), async (req, res, next) => {
   const chatSpan = startSpan('chat.request', { 'http.request_id': req.id, 'chat.query': message, 'chat.scope': scope || 'global' });
 
   try {
-    logger.chatLog('Retriever started', { eventId: 'PINECONE_RETRIEVAL_STARTED' });
+    // 1. Extract memory block once (used for both query rewriter and downstream LLM answer generation)
+    const validMessages = (history || [])
+      .filter(msg => msg && (msg.role === 'user' || msg.role === 'bot'))
+      .filter(msg => msg.text && !msg.text.includes('[No response returned') && !msg.text.includes('⚠️ No response') && !msg.text.includes('❌ Failed'));
+
+    const chatHistory = validMessages
+      .map((msg, idx, arr) =>
+        msg.role === 'user'
+          ? { user: msg.text, bot: arr[idx + 1]?.role === 'bot' ? arr[idx + 1].text.slice(0, 120) : '' }
+          : null
+      ).filter(Boolean)
+      .slice(-2);
+
+    const memory_block = chatHistory.map(pair => `User: ${pair.user}\nBot: ${pair.bot}`).join('\n');
+
+    // 2. Query Rewriter Step (Fail-Open)
+    let searchQuery = message;
+    let isRewritten = false;
+    let rewriteLatency = 0;
+
+    if (config.retrieval.queryRewriteEnabled) {
+      const rewriteSpan = startSpan('chat.query_rewrite', { 'http.request_id': req.id, 'chat.raw_query': message });
+      const rewriteStartTime = Date.now();
+
+      try {
+        const rewritten = await rewriteQuery({ user_query: message, memory_block }, config.retrieval.queryRewriteTimeoutMs);
+        if (rewritten && rewritten.trim()) {
+          searchQuery = rewritten.trim();
+          isRewritten = searchQuery.toLowerCase() !== message.toLowerCase();
+        }
+        rewriteLatency = Date.now() - rewriteStartTime;
+
+        endSpan(rewriteSpan, {
+          'chat.raw_query': message,
+          'chat.rewritten_query': searchQuery,
+          'chat.is_rewritten': isRewritten,
+          'chat.rewrite_latency_ms': rewriteLatency
+        });
+
+        logger.chatLog('Query rewrite completed', {
+          eventId: 'QUERY_REWRITE_COMPLETED',
+          rawQuery: message,
+          searchQuery,
+          isRewritten,
+          latencyMs: rewriteLatency
+        });
+      } catch (rewriteErr) {
+        rewriteLatency = Date.now() - rewriteStartTime;
+        endSpan(rewriteSpan, { 'chat.rewrite_failed': true, 'error': rewriteErr.message });
+        logger.warn('[QueryRewriter] Error during query rewrite — falling back to raw user query', { error: rewriteErr.message });
+        searchQuery = message;
+      }
+    } else {
+      logger.chatLog('Query rewriter disabled via QUERY_REWRITE_ENABLED', { eventId: 'QUERY_REWRITE_SKIPPED' });
+    }
+
+    // 3. Document Retrieval using searchQuery (rewritten or fallback raw message)
+    logger.chatLog('Retriever started', { eventId: 'PINECONE_RETRIEVAL_STARTED', searchQuery });
     let resolvedDocId = documentId;
     let resolvedFilename = documentId;
     if (scope === 'document' && documentId) {
@@ -43,7 +100,7 @@ router.post('/', validate(schemas.chatSchema), async (req, res, next) => {
 
     const retrievalSpan = startSpan('chat.pinecone_retrieval', { 'http.request_id': req.id });
     const pineconeStartTime = Date.now();
-    const chunks = await getRelevantChunks(message, config.retrieval.topK, category, scope, resolvedDocId, resolvedFilename);
+    const chunks = await getRelevantChunks(searchQuery, config.retrieval.topK, category, scope, resolvedDocId, resolvedFilename);
     const pineconeLatency = Date.now() - pineconeStartTime;
     endSpan(retrievalSpan, { 'retrieval.chunk_count': chunks.length, 'retrieval.top_score': chunks[0]?.score || 0, 'retrieval.latency_ms': pineconeLatency, 'retrieval.hybrid_enabled': config.retrieval.hybridEnabled });
     
@@ -94,21 +151,6 @@ router.post('/', validate(schemas.chatSchema), async (req, res, next) => {
       isRefusal = true;
     }
 
-    // Build memory block if needed (or leave blank)
-    const validMessages = (history || [])
-      .filter(msg => msg && (msg.role === 'user' || msg.role === 'bot'))
-      .filter(msg => msg.text && !msg.text.includes('[No response returned') && !msg.text.includes('⚠️ No response') && !msg.text.includes('❌ Failed'));
-
-    const chatHistory = validMessages
-      .map((msg, idx, arr) =>
-        msg.role === 'user'
-          ? { user: msg.text, bot: arr[idx + 1]?.role === 'bot' ? arr[idx + 1].text.slice(0, 120) : '' }
-          : null
-      ).filter(Boolean)
-      .slice(-2);
-
-    let memory_block = chatHistory.map(pair => `User: ${pair.user}\nBot: ${pair.bot}`).join('\n');  
-
     // --- Call your Python LLMService ---
     logger.chatLog('LLM request sent', { eventId: 'LLM_REQUEST_SENT', historyLength: chatHistory.length });
     const llmSpan = startSpan('chat.llm_generate', { 'http.request_id': req.id, 'llm.is_refusal': isRefusal });
@@ -149,7 +191,10 @@ router.post('/', validate(schemas.chatSchema), async (req, res, next) => {
 
     // Log query in search_logs
     await db.collection('search_logs').insertOne({
-      query: message,
+      query: searchQuery,
+      rawQuery: message,
+      isRewritten,
+      rewriteLatency,
       category: category || 'all',
       sessionId: req.body.sessionId || userId || null,
       timestamp: new Date(),

@@ -85,4 +85,59 @@ function getLLMResponse(args) {
   return withRetry('LLMService', () => llmBreaker.fire(args));
 }
 
-module.exports = { getLLMResponse };
+function _analyzeContent({ system_prompt, content, task_type }) {
+  return new Promise((resolve, reject) => {
+    const req = {
+      system_prompt,
+      content,
+      task_type
+    };
+    client.analyzeContent(req, (err, response) => {
+      if (err) return reject(err);
+      resolve(response);
+    });
+  });
+}
+
+const analyzeBreaker = new CircuitBreaker(_analyzeContent, breakerOptions);
+
+async function analyzeContent(args) {
+  return withRetry('LLMService.analyzeContent', () => analyzeBreaker.fire(args));
+}
+
+async function rewriteQuery({ user_query, memory_block = '' }, timeoutMs = 3500) {
+  const system_prompt = 
+    "You are a query rewriting module for an enterprise document search engine. " +
+    "Your goal is to convert follow-up user queries into concise, standalone, search-optimized search queries. " +
+    "Use the provided conversation history to resolve pronouns, references, or implicit context (e.g. 'what about that policy' -> 'what about the Microsoft AI Governance Policy'). " +
+    "Output ONLY the single rewritten search query string. Do NOT add conversational greetings, explanations, or quotes. " +
+    "If the query is already a clear standalone question or no context is required, return the exact original query.";
+
+  const content = memory_block 
+    ? `Recent Conversation History:\n${memory_block}\n\nUser Query to Rewrite: ${user_query}`
+    : `User Query to Rewrite: ${user_query}`;
+
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Query rewrite timeout exceeded')), timeoutMs);
+  });
+
+  try {
+    const response = await Promise.race([
+      analyzeContent({ system_prompt, content, task_type: 'query_rewriting' }),
+      timeoutPromise
+    ]);
+
+    if (response && response.result) {
+      const rewritten = response.result.trim().replace(/^["']|["']$/g, '');
+      if (rewritten && rewritten.length > 0) {
+        return rewritten;
+      }
+    }
+    return null;
+  } catch (err) {
+    logger.warn(`[QueryRewriter] gRPC call failed or timed out: ${err.message}. Falling back to raw user query.`);
+    return null;
+  }
+}
+
+module.exports = { getLLMResponse, rewriteQuery };

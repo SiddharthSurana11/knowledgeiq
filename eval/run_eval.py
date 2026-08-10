@@ -32,7 +32,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Load env variables from API Gateway
-load_dotenv("e:/knowledgeiq-platform/ai-chatbot-project/apps/api-gateway/.env")
+env_path = Path(__file__).parent.parent / 'apps' / 'api-gateway' / '.env'
+if not env_path.exists():
+    env_path = Path(__file__).parent.parent / '.env'
+load_dotenv(str(env_path))
 
 # Ensure UTF-8 output encoding on Windows terminals
 if sys.platform == "win32":

@@ -35,7 +35,9 @@ const config = {
     topK: parseInt(process.env.RETRIEVAL_TOP_K || '15', 10),
     hybridEnabled: process.env.HYBRID_RETRIEVAL_ENABLED === 'true',
     hybridCandidatePoolSize: parseInt(process.env.HYBRID_CANDIDATE_POOL_SIZE || '25', 10),
-    rerankTopN: parseInt(process.env.RERANK_TOP_N || '10', 10)
+    rerankTopN: parseInt(process.env.RERANK_TOP_N || '10', 10),
+    queryRewriteEnabled: process.env.QUERY_REWRITE_ENABLED !== 'false',
+    queryRewriteTimeoutMs: parseInt(process.env.QUERY_REWRITE_TIMEOUT_MS || '3500', 10)
   },
   cors: {
     trustedOrigins: (process.env.CORS_TRUSTED_ORIGINS || '*').split(',').map(o => o.trim())
