@@ -8,9 +8,10 @@
   2. `kiq-embedding-service`: Python 3.11 gRPC vector embedding & document processing service (port 50052).
   3. `kiq-llm-service`: Python 3.11 gRPC failover LLM synthesis service (port 50053).
   4. `kiq-api-gateway`: Node.js 20 Express gateway (port 5000) with robust proto resolution and MinIO client config.
-  5. `kiq-frontend`: React/Vite single-page application served via Nginx (port 5173).
-- Fast Docker build pipeline: static assets compiled locally via host script (`cmd /c npm run build`), directly copied into Nginx base image in <2 seconds.
+  5. `kiq-frontend`: React/Vite single-page application built via self-contained multi-stage Docker build (`node:20-alpine` builder stage compiling Vite assets, `nginx:alpine` runtime stage serving on port 5173). Fully builds on fresh machines with only Docker installed.
+- Fast Docker build pipeline: static assets compiled inside Docker builder stage cleanly cached in Nginx base image.
 - CPU PyTorch wheel caching and Debian Bookworm base image configuration for stable container creation.
+- Audited `LLM_PROVIDER_ORDER` in `.env`, `.env.example`, and `config.py` default fallback to ensure `claude` is excluded (`groq,gemini,openrouter`) unless `ANTHROPIC_API_KEY` is explicitly configured.
 
 ### 2. Workstream B — Pre-Public Security Audit
 - Pinned `AUTH_ENABLED=true` by default in `.env.example`.

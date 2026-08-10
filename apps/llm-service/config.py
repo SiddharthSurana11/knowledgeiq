@@ -15,7 +15,7 @@ class Config:
     
     # LLM Provider configuration
     # Can be a comma-separated list of providers, e.g., "openrouter,gemini,claude"
-    LLM_PROVIDER_ORDER = os.getenv("LLM_PROVIDER_ORDER", os.getenv("LLM_PROVIDER", "openrouter"))
+    LLM_PROVIDER_ORDER = os.getenv("LLM_PROVIDER_ORDER", os.getenv("LLM_PROVIDER", "groq,gemini,openrouter"))
     
     # Provider Health Memory
     PROVIDER_HEALTH_PENALTY_SECONDS = int(os.getenv("PROVIDER_HEALTH_PENALTY_SECONDS", "15"))
