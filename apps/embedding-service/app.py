@@ -69,8 +69,52 @@ def log_job_status(job_id, step, status, extra=None):
         upsert=True
     )
 
+# --- Helper: MinIO Object Fetcher ---
+_minio_client = None
+
+def get_minio_client():
+    global _minio_client
+    if _minio_client is None:
+        minio_endpoint = os.getenv("MINIO_ENDPOINT", "minio")
+        if ":" in minio_endpoint:
+            host, port = minio_endpoint.split(":")
+        else:
+            host = minio_endpoint
+            port = os.getenv("MINIO_PORT", "9000")
+        
+        access_key = os.getenv("MINIO_ACCESS_KEY", "minioadmin")
+        secret_key = os.getenv("MINIO_SECRET_KEY", "minioadmin")
+        use_ssl = os.getenv("MINIO_USE_SSL", "false").lower() == "true"
+        
+        from minio import Minio
+        _minio_client = Minio(
+            f"{host}:{port}",
+            access_key=access_key,
+            secret_key=secret_key,
+            secure=use_ssl
+        )
+    return _minio_client
+
+def ensure_local_file(path_or_key, original_name=""):
+    if os.path.exists(path_or_key):
+        return path_or_key, False
+
+    bucket = os.getenv("MINIO_BUCKET", "knowledgeiq")
+    client = get_minio_client()
+    
+    import tempfile
+    ext = os.path.splitext(path_or_key)[1] or os.path.splitext(original_name)[1] or ".pdf"
+    fd, tmp_file_path = tempfile.mkstemp(suffix=ext)
+    os.close(fd)
+    
+    logging.info(f"[MinIO Fetcher] Fetching '{path_or_key}' from bucket '{bucket}' to local temp path '{tmp_file_path}'")
+    client.fget_object(bucket, path_or_key, tmp_file_path)
+    return tmp_file_path, True
+
 class EmbeddingServiceServicer(embedding_pb2_grpc.EmbeddingServiceServicer):
     def HandleUpload(self, request, context):
+        local_file_path = None
+        is_temp_download = False
         try:
             temp_path = request.temp_path
             category = request.category
@@ -81,11 +125,14 @@ class EmbeddingServiceServicer(embedding_pb2_grpc.EmbeddingServiceServicer):
 
             job_id = f"{original_name}_{category}_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
 
-            logging.info(f"Received file: {original_name} ({category}), path: {temp_path}, docId: {document_id}")
+            logging.info(f"Received file: {original_name} ({category}), path/key: {temp_path}, docId: {document_id}")
+
+            # Ensure file is available locally (fetching from MinIO if temp_path is a storageKey)
+            local_file_path, is_temp_download = ensure_local_file(temp_path, original_name)
 
             # --- Extraction ---
             log_job_status(job_id, "extraction", "started")
-            extracted = extract_text(temp_path)
+            extracted = extract_text(local_file_path)
             assert isinstance(extracted, dict), "extract_text() must return a dict"
             if not extracted or not extracted.get('text'):
                 log_job_status(job_id, "extraction", "failed", {"error": "No text extracted."})
@@ -267,6 +314,12 @@ class EmbeddingServiceServicer(embedding_pb2_grpc.EmbeddingServiceServicer):
                 final_path=getattr(request, "temp_path", ""),
                 message=str(e)            
             )
+        finally:
+            if is_temp_download and local_file_path and os.path.exists(local_file_path):
+                try:
+                    os.remove(local_file_path)
+                except Exception as cleanup_err:
+                    logging.warning(f"Failed to remove temporary downloaded file {local_file_path}: {cleanup_err}")
         
     def GetEmbedding(self, request, context):
         span = _tracer.start_span("embedding.GetEmbedding") if _tracer else None

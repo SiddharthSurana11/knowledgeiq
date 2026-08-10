@@ -94,7 +94,18 @@ router.post('/', validate(schemas.uploadBodySchema, 'body'), upload.single('file
 
     logger.uploadLog('Validation passed', { eventId: 'VALIDATION_PASSED', documentId, resolvedCategory });
 
-    // Duplicate Ingestion Guard Checks
+    // 1. Upload to Object Storage (MinIO) FIRST
+    const storageStartTime = Date.now();
+    const storageResult = await storage.upload({
+      buffer: file.buffer,
+      filename: file.originalname,
+      mimetype: file.mimetype,
+      category: resolvedCategory
+    });
+    const minioUploadLatency = Date.now() - storageStartTime;
+    logger.uploadLog('Stored in MinIO', { eventId: 'MINIO_UPLOAD_COMPLETED', storageKey: storageResult.storageKey, latencyMs: minioUploadLatency });
+
+    // 2. Duplicate Ingestion Guard Checks using MinIO storageKey
     const dupStartTime = Date.now();
     let dupResult;
     try {
@@ -102,7 +113,7 @@ router.post('/', validate(schemas.uploadBodySchema, 'body'), upload.single('file
         fileBuffer: file.buffer,
         filename: file.originalname,
         category: resolvedCategory,
-        tempPath: tempFile.name,
+        tempPath: storageResult.storageKey,
         documentId
       });
     } catch (dupErr) {
@@ -125,7 +136,7 @@ router.post('/', validate(schemas.uploadBodySchema, 'body'), upload.single('file
       return next(err);
     }
 
-    // Enqueue contradiction check as an async background job instead of blocking
+    // 3. Enqueue contradiction check as an async background job
     const contradictionJobStartTime = Date.now();
     await db.collection('contradiction_jobs').insertOne({
       documentId: docPrep.documentId,
@@ -142,23 +153,12 @@ router.post('/', validate(schemas.uploadBodySchema, 'body'), upload.single('file
     const contradictionEnqueueLatency = Date.now() - contradictionJobStartTime;
     logger.uploadLog('Contradiction check enqueued', { eventId: 'CONTRADICTION_JOB_ENQUEUED', latencyMs: contradictionEnqueueLatency });
 
-    // Upload to Object Storage (MinIO)
-    const storageStartTime = Date.now();
-    const storageResult = await storage.upload({
-      buffer: file.buffer,
-      filename: file.originalname,
-      mimetype: file.mimetype,
-      category: resolvedCategory
-    });
-    const minioUploadLatency = Date.now() - storageStartTime;
-    logger.uploadLog('Stored in MinIO', { eventId: 'MINIO_UPLOAD_COMPLETED', storageKey: storageResult.storageKey, latencyMs: minioUploadLatency });
-
-    // Call Embedding Service (gRPC) to index
+    // 4. Call Embedding Service (gRPC) using MinIO storageKey
     logger.uploadLog('Embedding started', { eventId: 'EMBEDDING_STARTED' });
     const embeddingStartTime = Date.now();
     
     handleUpload({
-      temp_path: tempFile.name,
+      temp_path: storageResult.storageKey,
       category: resolvedCategory,
       original_name: `${file.originalname}::${docPrep.documentId}`,
       userId: req.user ? req.user.id : null

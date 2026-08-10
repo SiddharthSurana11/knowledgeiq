@@ -26,5 +26,7 @@ python-dotenv
 grpcio>=1.73.1
 grpcio-tools>=1.73.1
 
-# MongoDB
+# MongoDB & Object Storage
 pymongo
+minio
+
