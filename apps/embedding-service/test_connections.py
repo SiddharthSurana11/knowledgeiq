@@ -6,7 +6,7 @@ import ssl
 
 def test_pinecone():
     print("Testing Pinecone...")
-    api_key = "[REDACTED_PINECONE_KEY]"
+    api_key = os.getenv("PINECONE_API_KEY", "")
     url = "https://api.pinecone.io/indexes"
     req = urllib.request.Request(url, headers={"Api-Key": api_key})
     try:
@@ -21,7 +21,7 @@ def test_pinecone():
 
 def test_mongo():
     print("Testing MongoDB...")
-    uri = "[REDACTED_MONGODB_URI]"
+    uri = os.getenv("MONGODB_URI", "")
     try:
         client = MongoClient(uri, serverSelectionTimeoutMS=5000)
         client.admin.command('ping')
