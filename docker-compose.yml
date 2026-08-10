@@ -1,0 +1,97 @@
+networks:
+  kiq-network:
+    driver: bridge
+
+services:
+  # 1. Object Storage: Local MinIO S3-Compatible Storage
+  minio:
+    image: minio/minio:latest
+    container_name: kiq-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    networks:
+      - kiq-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # 2. Embedding & Preprocessing Service (Python)
+  embedding-service:
+    build:
+      context: ./apps/embedding-service
+      dockerfile: Dockerfile
+    container_name: kiq-embedding-service
+    env_file:
+      - ./apps/embedding-service/.env
+    environment:
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+    networks:
+      - kiq-network
+    depends_on:
+      minio:
+        condition: service_healthy
+
+  # 3. LLM Failover & Synthesis Service (Python)
+  llm-service:
+    build:
+      context: ./apps/llm-service
+      dockerfile: Dockerfile
+    container_name: kiq-llm-service
+    env_file:
+      - ./apps/llm-service/.env
+    networks:
+      - kiq-network
+
+  # 4. API Gateway & Business Logic (Node.js)
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./apps/api-gateway/Dockerfile
+    container_name: kiq-api-gateway
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./apps/api-gateway/.env
+    environment:
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - EMBEDDING_GRPC_HOST=embedding-service:50052
+      - LLM_GRPC_HOST=llm-service:50053
+    networks:
+      - kiq-network
+    depends_on:
+      - embedding-service
+      - llm-service
+      - minio
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # 5. Single-Page Application Frontend (React/Vite served via Nginx)
+  frontend:
+    build:
+      context: ./apps/frontend_reactjs
+      dockerfile: Dockerfile
+    container_name: kiq-frontend
+    ports:
+      - "5173:80"
+    networks:
+      - kiq-network
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:80/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3

@@ -13,12 +13,17 @@ class MinIOProvider extends StorageProvider {
   constructor() {
     super();
     this._bucket = process.env.MINIO_BUCKET;
+    const rawEndpoint = process.env.MINIO_ENDPOINT || 'localhost';
+    const hasPort = rawEndpoint.includes(':');
+    const endpointHost = hasPort ? rawEndpoint.split(':')[0] : rawEndpoint;
+    const endpointPort = hasPort ? parseInt(rawEndpoint.split(':')[1], 10) : parseInt(process.env.MINIO_PORT || '9000', 10);
+
     this._client = new Client({
-      endPoint:  process.env.MINIO_ENDPOINT,
-      port:      parseInt(process.env.MINIO_PORT || '9000', 10),
+      endPoint:  endpointHost,
+      port:      endpointPort,
       useSSL:    process.env.MINIO_USE_SSL === 'true',
-      accessKey: process.env.MINIO_ACCESS_KEY,
-      secretKey: process.env.MINIO_SECRET_KEY,
+      accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
+      secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
     });
   }
 

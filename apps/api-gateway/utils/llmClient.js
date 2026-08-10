@@ -2,7 +2,23 @@ const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
-const PROTO_PATH = path.resolve(__dirname, '../../../protos/llm_service.proto');
+const fs = require('fs');
+
+function resolveProtoPath(filename) {
+  const candidates = [
+    path.resolve(__dirname, '../../../protos', filename),
+    path.resolve(__dirname, '../../protos', filename),
+    path.resolve(__dirname, '../protos', filename),
+    path.resolve('/protos', filename),
+    path.resolve('/app/protos', filename)
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return candidates[0];
+}
+
+const PROTO_PATH = resolveProtoPath('llm_service.proto');
 const { config } = require('../config');
 const CircuitBreaker = require('opossum');
 const { withRetry } = require('./retryHelper');

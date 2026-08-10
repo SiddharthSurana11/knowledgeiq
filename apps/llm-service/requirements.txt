@@ -1,0 +1,13 @@
+# Core gRPC & Protobuf
+grpcio>=1.73.1
+grpcio-tools>=1.73.1
+
+# Database & Environment
+pymongo
+python-dotenv
+
+# Background Scheduler
+apscheduler
+
+# HTTP REST Client for Groq, Gemini, OpenRouter, and Claude API providers
+requests
