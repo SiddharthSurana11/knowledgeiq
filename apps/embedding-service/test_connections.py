@@ -1,8 +1,11 @@
 import os
+from dotenv import load_dotenv
 from pymongo import MongoClient
 import urllib.request
 import json
 import ssl
+
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 def test_pinecone():
     print("Testing Pinecone...")
