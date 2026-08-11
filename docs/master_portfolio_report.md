@@ -103,7 +103,7 @@ flowchart TD
 - **5-Container Docker Stack**: Containerized all services (`kiq-frontend`, `kiq-api-gateway`, `kiq-embedding-service`, `kiq-llm-service`, `kiq-minio`) connected via bridge network `kiq-network`.
 - **Decoupled MinIO-First Pipeline**: Re-engineered upload flow to upload files directly to MinIO first, allowing isolated container processing with **automatic deletion of MinIO objects on duplicate rejections (`409 Conflict`)**.
 - **Self-Contained Multi-Stage Frontend Build**: Created multi-stage `Dockerfile` (`node:20-alpine` builder $\rightarrow$ `nginx:alpine` runtime), enabling deployment on fresh machines with zero pre-installed host Node.js.
-- **Deployment Documentation**: Researched and authored [`DEPLOYMENT.md`](file:///e:/knowledgeiq-platform/DEPLOYMENT.md) covering Railway, Render, and Oracle Cloud Always Free VM (4 OCPU / 24GB RAM) hosting.
+- **Deployment Documentation**: Researched and authored [`DEPLOYMENT.md`](../DEPLOYMENT.md) covering Railway, Render, and Oracle Cloud Always Free VM (4 OCPU / 24GB RAM) hosting.
 
 ---
 

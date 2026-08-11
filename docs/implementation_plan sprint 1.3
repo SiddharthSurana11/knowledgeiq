@@ -13,7 +13,7 @@ This plan implements Sprint 1.3, establishing persistent document metadata, gove
 
 ### Embedding Service Component
 
-#### [MODIFY] [auto_embed_and_push.py](file:///e:/knowledgeiq-platform/ai-chatbot-project/apps/embedding-service/debug-tools/auto_embed_and_push.py)
+#### [MODIFY] [auto_embed_and_push.py](../apps/embedding-service/debug-tools/auto_embed_and_push.py)
 * Update legacy import paths to match the current python directory structure:
   * `from modules.data_extraction` $\rightarrow$ `from modules.chunking.data_extraction`
   * `from modules.data_preprocessing` $\rightarrow$ `from modules.chunking.data_preprocessing`
@@ -24,7 +24,7 @@ This plan implements Sprint 1.3, establishing persistent document metadata, gove
 
 ### API Gateway Component
 
-#### [MODIFY] [pineconeClient.js](file:///e:/knowledgeiq-platform/ai-chatbot-project/apps/api-gateway/utils/pineconeClient.js)
+#### [MODIFY] [pineconeClient.js](../apps/api-gateway/utils/pineconeClient.js)
 * Expose a new function `deleteVectorsByDocument(filename, category)` that deletes all chunks belonging to a specific file and category using Pinecone metadata filters:
   ```javascript
   async function deleteVectorsByDocument(filename, category) {
@@ -37,7 +37,7 @@ This plan implements Sprint 1.3, establishing persistent document metadata, gove
   }
   ```
 
-#### [NEW] [documentService.js](file:///e:/knowledgeiq-platform/ai-chatbot-project/apps/api-gateway/services/documentService.js)
+#### [NEW] [documentService.js](../apps/api-gateway/services/documentService.js)
 * A new service-layer module containing database and vector search logic for the `documents` collection:
   * `prepareDocumentUpload({ filename, category, fileBuffer, uploader })`: Computes SHA-256 hash of buffer, queries if a document exists, increments `version` and triggers vector deletion if it exists, and generates a UUID `documentId` if new.
   * `saveDocumentMetadata({ documentId, filename, category, source, uploadedBy, version, hash, status })`: Commits the completed document metadata to MongoDB after successful embedding.
@@ -46,14 +46,14 @@ This plan implements Sprint 1.3, establishing persistent document metadata, gove
   * `updateStatus(id, status)`: Sets the status fields (`'active'`, `'archived'`, etc.).
   * `markReviewed(id, reviewedBy)`: Sets the `lastReviewed` timestamp and `reviewedBy` user indicator.
 
-#### [NEW] [documents.js](file:///e:/knowledgeiq-platform/ai-chatbot-project/apps/api-gateway/routes/documents.js)
+#### [NEW] [documents.js](../apps/api-gateway/routes/documents.js)
 * Implements express routes to handle governance API endpoints:
   * `GET /api/documents`
   * `GET /api/documents/:id`
   * `PATCH /api/documents/:id/status`
   * `PATCH /api/documents/:id/review`
 
-#### [MODIFY] [server.js](file:///e:/knowledgeiq-platform/ai-chatbot-project/apps/api-gateway/server.js)
+#### [MODIFY] [server.js](../apps/api-gateway/server.js)
 * Register the new `/api/documents` routes.
 * Integrate `DocumentService` into the `/api/upload` endpoint:
   1. Generate file SHA-256 hash and prepare the document version/UUID in step 1.
@@ -67,9 +67,9 @@ This plan implements Sprint 1.3, establishing persistent document metadata, gove
 
 ### Automated Tests
 * Run syntax checks:
-  * `node --check ai-chatbot-project/apps/api-gateway/server.js`
-  * `node --check ai-chatbot-project/apps/api-gateway/routes/documents.js`
-  * `python -m py_compile ai-chatbot-project/apps/embedding-service/debug-tools/auto_embed_and_push.py`
+  * `node --check apps/api-gateway/server.js`
+  * `node --check apps/api-gateway/routes/documents.js`
+  * `python -m py_compile apps/embedding-service/debug-tools/auto_embed_and_push.py`
 
 ### Manual Verification
 1. **Document Upload:** Upload a test PDF file to category `IT`. Verify it generates a document in `documents` collection with `version: 1`, a valid SHA-256 hash, and `status: 'active'`.

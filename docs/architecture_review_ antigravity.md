@@ -1,5 +1,5 @@
 # Enterprise Codebase Audit & Architecture Review
-**Project:** AI Chatbot (LMS, LOS, & LF Syndicate Specialist)  
+**Project:** AI Chatbot (Enterprise Document Intelligence Specialist)
 **Author:** Principal Software Architect  
 
 This document provides a comprehensive architecture audit, data flow mapping, component analysis, and reusability assessment of the repository.
@@ -45,7 +45,7 @@ graph TD
 
 | Component | Technology | Primary Responsibilities |
 | :--- | :--- | :--- |
-| **Frontend** | React, Vite, Tailwind CSS | <ul><li>Provides user interface for chat sessions and document category uploads (`LMS`, `LOS`, `Syndicate`, `Other`).</li><li>Captures fine-grained user feedback (thumbs up/down, error classification tags, and text comments).</li><li>Maintains real-time admin view for polling and reviewing feedback.</li></ul> |
+| **Frontend** | React, Vite, Tailwind CSS | <ul><li>Provides user interface for chat sessions and document category uploads (e.g., HR, Finance, IT, Other).</li><li>Captures fine-grained user feedback (thumbs up/down, error classification tags, and text comments).</li><li>Maintains real-time admin view for polling and reviewing feedback.</li></ul> |
 | **API Gateway** | Node.js, Express, gRPC Clients | <ul><li>Acts as the central router (`/api/chat`, `/api/upload`, `/api/feedback`, `/api/sessions`).</li><li>Coordinates the upload pipeline by saving raw files to Google Drive, writing to temporary storage, and initiating gRPC processes.</li><li>Retrieves relevant metadata chunks directly from Pinecone to form RAG contexts.</li><li>Manages chat session CRUD and feedback storage in MongoDB.</li></ul> |
 | **Embedding Service** | Python, gRPC Server, SentenceTransformers | <ul><li>Extracts text from multi-format files (PDF, DOCX, PPTX, JPEG, PNG).</li><li>Executes OCR via `pytesseract` for scanned PDFs, presentation images, and document tables.</li><li>Cleans text, tokenizes (via `tiktoken` for `gpt-4` lengths), and constructs overlapping chunks (800 token limits, 100 token overlap).</li><li>Generates normalized vectors (384-dimensional) using `all-MiniLM-L6-v2`.</li><li>Upserts vector payloads directly to Pinecone and records job statuses to MongoDB.</li></ul> |
 | **LLM Service** | Python, gRPC Server, APScheduler | <ul><li>Wraps the Anthropic Claude API to generate answers, follow-up questions, and track document hits.</li><li>Maintains a background cron job (APScheduler) running every 10 minutes to ingest MongoDB feedback.</li><li>Dynamically compiles approved feedback into a serialized `few_shot_examples.json` block injected into system prompts.</li></ul> |
@@ -186,7 +186,7 @@ sequenceDiagram
 1.  **API Gateway Pattern**: The Node.js gateway consolidates routing, manages external data sources (Google Drive, MongoDB, Pinecone), handles CORS, and exposes unified REST APIs to the React frontend while orchestrating behind-the-scenes gRPC microservices.
 2.  **Retrieval-Augmented Generation (RAG)**: Connects a generative LLM to a curated vector index, ensuring model constraints (no hallucinations, strict grounding in provided materials).
 3.  **Human-In-The-Loop Few-Shot Ingestion**: Rather than static system prompts, the LLM uses a scheduled synchronization agent to inject approved user corrections directly into the context window.
-4.  **Adapter / Repository Pattern**: Utility files like [pineconeClient.js](file:///e:/Projects/Extracted%20Sigma%20AI%20Chatbot/ai-chatbot-project/apps/api-gateway/utils/pineconeClient.js) and [driveClient.js](file:///e:/Projects/Extracted%20Sigma%20AI%20Chatbot/ai-chatbot-project/apps/api-gateway/utils/driveClient.js) abstract remote infrastructure calls away from route handlers.
+4.  **Adapter / Repository Pattern**: Utility files like [pineconeClient.js](../apps/api-gateway/utils/pineconeClient.js) and [driveClient.js](../apps/api-gateway/utils/driveClient.js) abstract remote infrastructure calls away from route handlers.
 
 ---
 

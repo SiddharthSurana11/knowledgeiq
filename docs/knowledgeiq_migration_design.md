@@ -1,17 +1,17 @@
-# Migration Design: Transforming Sigma into KnowledgeIQ
+# Migration Design: Evolving Prototype Architecture into KnowledgeIQ
 
-This design document outlines the minimum necessary changes to generalize the hardcoded, category-specific Sigma architecture into a dynamic, scaleable enterprise knowledge base called **KnowledgeIQ**, maximizing code reuse.
+This design document outlines the minimum necessary changes to generalize the hardcoded, category-specific prototype architecture into a dynamic, scaleable enterprise knowledge base called **KnowledgeIQ**, maximizing code reuse.
 
 ---
 
 ## 1. Core Architectural Shift
 
-Sigma contains hardcoded configurations for **LMS**, **LOS**, and **LF Syndicate** documents. To transform it into **KnowledgeIQ**, we must transition from **static domain hardcoding** to **dynamic domain mapping** driven by database configurations.
+The initial prototype contained hardcoded configurations for specific document domains. To transform it into **KnowledgeIQ**, we must transition from **static domain hardcoding** to **dynamic domain mapping** driven by database configurations.
 
 ```mermaid
 graph LR
-    subgraph Sigma (Static)
-        A["Hardcoded Categories (LMS, LOS, Syndicate)"] --> B[Static Prompts & Hardcoded UI]
+    subgraph Prototype (Static)
+        A["Hardcoded Categories (Domain-Specific)"] --> B[Static Prompts & Hardcoded UI]
     end
     subgraph KnowledgeIQ (Dynamic)
         C[MongoDB Config: 'categories'] --> D[Dynamic UI Uploads]
@@ -46,7 +46,7 @@ Convert the string field `category` to reference a dynamic category key.
     "filename": "annual_leave_2026.pdf",
     "driveFileId": "drive_id_123",
     "uploadedAt": "ISODate",
--   "category": "LMS", 
+-   "category": "legacy_category",
 +   "category": "hr_policies", // Matches a record in the 'categories' collection
     "embeddingStatus": "completed"
   }
@@ -85,7 +85,7 @@ We need to add a categories endpoint and modify upload and chat parameters.
 
 ### A. Embedding Service (Python)
 *   **`vector_db_pinecone.py`**:
-    *   **REMOVE** the `detect_category(query_text)` function which searches for static string matches like `'LMS'`, `'LOS'`, and `'LF Syndicate'`.
+    *   **REMOVE** the `detect_category(query_text)` function which searches for static string matches.
     *   Rely on metadata-based category filtering passed dynamically by the API Gateway during semantic queries.
 *   **`app.py`**:
     *   Keep the gRPC interface `HandleUpload` and `GetEmbedding` intact. The category ID continues to flow naturally into Pinecone as metadata.
@@ -94,7 +94,7 @@ We need to add a categories endpoint and modify upload and chat parameters.
 *   **`prompt_instructions.txt`**:
     *   Generalize the system prompt template. Replace specific references:
     ```diff
--   You are a smart assistant trained specifically on LMS, LOS, and LF Syndicate documents.
+-   You are a smart assistant trained specifically on domain-specific documents.
 +   You are KnowledgeIQ, a highly capable assistant trained on internal company documentation.
 -   The documents don’t seem to have information on this. Would you like a general overview instead?
 +   I could not find relevant facts in the corporate knowledge base to answer your question.
@@ -117,7 +117,7 @@ The UI will transition to a polished, unified dashboard.
 | CHAT HISTORY         |  Active Filter: [All Categories v]   |
 |                      +--------------------------------------+
 | - Q1 Benefits        |  👋 Hi! I'm KnowledgeIQ. Ask me      |
-| - Q2 LMS Syllabus    |  anything about our loaded systems.  |
+| - Q2 Policies        |  anything about our loaded systems.  |
 |                      |                                      |
 | [New Chat Session]   |                                      |
 |                      |  [ Type your question...   ] [Send]  |
@@ -138,7 +138,7 @@ The UI will transition to a polished, unified dashboard.
     ```
 
 ### B. Sidebar & ChatBox Component
-*   **Modify**: Update logos, branding, and text prompts from "Sigma" to "KnowledgeIQ".
+*   **Modify**: Update logos, branding, and text prompts from prototype branding to "KnowledgeIQ".
 *   **UI Change**: Add a category selector dropdown in the chat toolbar to allow users to focus their search on specific knowledge areas (e.g., limit responses strictly to Legal or Engineering).
 
 ---

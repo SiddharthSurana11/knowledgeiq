@@ -53,11 +53,11 @@ Once initialized, open your browser to **`http://localhost:5173`** to access the
 
 KnowledgeIQ's technical evolution is guided by three formal Architecture Decision Records (ADRs):
 
-1. **[ADR 001: MinIO / S3-Compatible Object Storage Persistence](file:///e:/knowledgeiq-platform/docs/adr/001-storage-backend.md)**
+1. **[ADR 001: MinIO / S3-Compatible Object Storage Persistence](docs/adr/001-storage-backend.md)**
    - *Decision*: Standardized on MinIO / S3 object storage for raw uploaded document persistence, superseding legacy Google Drive dependencies to deliver local/in-cluster containerized blob storage.
-2. **[ADR 002: Async Worker Queue for Contradiction Detection](file:///e:/knowledgeiq-platform/docs/adr/002-contradiction-detection-location.md)**
+2. **[ADR 002: Async Worker Queue for Contradiction Detection](docs/adr/002-contradiction-detection-location.md)**
    - *Decision*: Decoupled document contradiction detection from synchronous upload HTTP requests into an asynchronous background polling worker (`ContradictionWorker`), maintaining upload latency under 2 seconds.
-3. **[ADR 003: Pre-Retrieval LLM Query Rewriting & Fail-Open Design](file:///e:/knowledgeiq-platform/docs/adr/003-query-rewriting.md)**
+3. **[ADR 003: Pre-Retrieval LLM Query Rewriting & Fail-Open Design](docs/adr/003-query-rewriting.md)**
    - *Decision*: Introduced an LLM-based query rewriter before document retrieval to resolve multi-turn pronouns and implicit context. Designed with a strict 3.5s timeout (`QUERY_REWRITE_TIMEOUT_MS`) that automatically **fails open** to the raw user query if upstream providers time out or encounter rate limits.
 
 ---
@@ -91,7 +91,7 @@ Retrieval accuracy and hallucination safety are continuously validated using an 
 
 ## 📌 Strategic Roadmap (Designed But Not Built)
 
-As documented in [`docs/ROADMAP.md`](file:///e:/knowledgeiq-platform/docs/ROADMAP.md), the following features are architecturally scoped for future releases:
+As documented in [`docs/ROADMAP.md`](docs/ROADMAP.md), the following features are architecturally scoped for future releases:
 
 1. **GraphRAG & Knowledge Graphs**:
    - Building entity-relationship graphs from ingested documents for complex multi-entity relation queries. Scoped out for initial release due to implementation complexity; hybrid RRF + cross-encoder reranking currently achieves 100% Recall@5.
@@ -111,7 +111,7 @@ Run the convenience script to launch all 4 application services in separate term
 ```
 
 ### Manual Service Startup
-1. **MinIO Server**: `minio server E:\minio_data` (Port 9000)
+1. **MinIO Server**: `minio server /path/to/minio_data` (Port 9000)
 2. **Embedding Service**: `cd apps/embedding-service && .\venv\Scripts\activate && python app.py` (Port 50052)
 3. **LLM Service**: `cd apps/llm-service && .\venv\Scripts\activate && python app.py` (Port 50053)
 4. **API Gateway**: `cd apps/api-gateway && npm start` (Port 5000)
@@ -133,4 +133,4 @@ Run the convenience script to launch all 4 application services in separate term
 
 ## 📄 License & Project Documentation
 
-For deep technical specifications, past phase changelogs, and security rotation checklists, refer to the **[KnowledgeIQ Master Project History Index](file:///e:/knowledgeiq-platform/docs/PROJECT_HISTORY.md)** and **[DEPLOYMENT.md](file:///e:/knowledgeiq-platform/DEPLOYMENT.md)**.
+For deep technical specifications, past phase changelogs, and security rotation checklists, refer to the **[KnowledgeIQ Master Project History Index](docs/PROJECT_HISTORY.md)** and **[DEPLOYMENT.md](DEPLOYMENT.md)**.

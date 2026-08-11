@@ -6,11 +6,11 @@ This tracker outlines the exact codebase changes, files to modify, database adju
 
 ## 1. Acceptance Criteria for Sprint 1
 
-1.  **System Rebranding**: No references to "Sigma" in the user interface (welcome prompts, headings, title bars). Brand names updated to "KnowledgeIQ".
+1.  **System Rebranding**: No references to legacy prototype names in the user interface (welcome prompts, headings, title bars). Brand names updated to "KnowledgeIQ".
 2.  **Dynamic Categories**: All documentation categories are loaded from MongoDB. Adding a new category row to the database dynamically adds it to the UI upload list without requiring code changes.
-3.  **LMS/LOS Generalization**: System prompts in the LLM service are domain-agnostic. The bot identifies as "KnowledgeIQ" and answers questions using any provided context chunks.
+3.  **Domain Generalization**: System prompts in the LLM service are domain-agnostic. The bot identifies as "KnowledgeIQ" and answers questions using any provided context chunks.
 4.  **Category Filtering**: Users can chat globally or focus queries on a single category, which utilizes Pinecone metadata filtering.
-5.  **Ingestion Compatibility**: Uploading documents under any dynamic category resolves target Google Drive folders dynamically and stores vectors with correct metadata.
+5.  **Ingestion Compatibility**: Uploading documents under any dynamic category resolves target storage folders dynamically and stores vectors with correct metadata.
 
 ---
 
@@ -57,7 +57,7 @@ A seed script must populate initial category configurations.
 
 ### A. API Gateway (Node.js)
 
-#### 1. [server.js](file:///e:/Projects/Extracted%20Sigma%20AI%20Chatbot/ai-chatbot-project/apps/api-gateway/server.js)
+#### 1. [server.js](../apps/api-gateway/server.js)
 *   **Remove**: Hardcoded `getDriveFolderId(category)` function.
 *   **Add**: Dynamic lookup logic in `/api/upload` endpoint.
     ```js
@@ -79,7 +79,7 @@ A seed script must populate initial category configurations.
     });
     ```
 
-#### 2. [pineconeClient.js](file:///e:/Projects/Extracted%20Sigma%20AI%20Chatbot/ai-chatbot-project/apps/api-gateway/utils/pineconeClient.js)
+#### 2. [pineconeClient.js](../apps/api-gateway/utils/pineconeClient.js)
 *   **Modify**: `getRelevantChunks(userQuery, topK = 5)` to accept optional `categoryId`.
 *   **Change**: Update query call to pass a metadata filter block to Pinecone when `categoryId` is set:
     ```js
@@ -94,7 +94,7 @@ A seed script must populate initial category configurations.
     }
     ```
 
-#### 3. [chatRoute.js](file:///e:/Projects/Extracted%20Sigma%20AI%20Chatbot/ai-chatbot-project/apps/api-gateway/routes/chatRoute.js)
+#### 3. [chatRoute.js](../apps/api-gateway/routes/chatRoute.js)
 *   **Modify**: Parse optional `categoryId` from the POST body.
 *   **Change**: Pass `categoryId` to the `getRelevantChunks` client utility:
     ```js
@@ -106,7 +106,7 @@ A seed script must populate initial category configurations.
 
 ### B. Embedding Service (Python)
 
-#### 1. [vector_db_pinecone.py](file:///e:/Projects/Extracted%20Sigma%20AI%20Chatbot/ai-chatbot-project/apps/embedding-service/modules/vectorDB/vector_db_pinecone.py)
+#### 1. [vector_db_pinecone.py](../apps/embedding-service/modules/vectorDB/vector_db_pinecone.py)
 *   **Remove**: Inside `detect_category(query_text)` function, delete hardcoded matching tags.
 *   **Change**: Modify `semantic_search_with_detection` to skip automatic detection overrides, allowing query filters to dictate search behavior directly.
 
@@ -114,7 +114,7 @@ A seed script must populate initial category configurations.
 
 ### C. LLM Service (Python)
 
-#### 1. [prompt_instructions.txt](file:///e:/Projects/Extracted%20Sigma%20AI%20Chatbot/ai-chatbot-project/apps/llm-service/prompt_instructions.txt)
+#### 1. [prompt_instructions.txt](../apps/llm-service/prompt_instructions.txt)
 *   **Change**: Update instructions to be domain-neutral.
     ```text
     You are KnowledgeIQ, a smart enterprise knowledge assistant.
@@ -127,7 +127,7 @@ A seed script must populate initial category configurations.
 
 ### D. Frontend (React)
 
-#### 1. [UploadPanel.jsx](file:///e:/Projects/Extracted%20Sigma%20AI%20Chatbot/ai-chatbot-project/apps/frontend_reactjs/src/components/UploadPanel.jsx)
+#### 1. [UploadPanel.jsx](../apps/frontend_reactjs/src/components/UploadPanel.jsx)
 *   **Modify**: Fetch category array from `/api/categories` on mount:
     ```js
     const [categories, setCategories] = useState([]);
@@ -147,7 +147,7 @@ A seed script must populate initial category configurations.
     </div>
     ```
 
-#### 2. [ChatBox.jsx](file:///e:/Projects/Extracted%20Sigma%20AI%20Chatbot/ai-chatbot-project/apps/frontend_reactjs/src/components/ChatBox.jsx)
+#### 2. [ChatBox.jsx](../apps/frontend_reactjs/src/components/ChatBox.jsx)
 *   **Rebrand**: Update welcome greetings to "KnowledgeIQ".
 *   **Add**: Category focus dropdown at the top of the chat area to allow filtering of queries:
     ```jsx
@@ -158,8 +158,8 @@ A seed script must populate initial category configurations.
     ```
 *   **Modify**: Send `categoryId: filterCategory` in the JSON request body to `POST /api/chat`.
 
-#### 3. [Sidebar.jsx](file:///e:/Projects/Extracted%20Sigma%20AI%20Chatbot/ai-chatbot-project/apps/frontend_reactjs/src/components/Sidebar.jsx)
-*   **Rebrand**: Change any hardcoded headers or footers referencing "Sigma Chatbot" to "KnowledgeIQ Portal".
+#### 3. [Sidebar.jsx](../apps/frontend_reactjs/src/components/Sidebar.jsx)
+*   **Rebrand**: Change any hardcoded headers or footers referencing legacy chatbot names to "KnowledgeIQ Portal".
 
 ---
 
@@ -168,7 +168,7 @@ A seed script must populate initial category configurations.
 - [ ] **DB Verification**: Seed MongoDB `categories` collection and verify records are accessible.
 - [ ] **API Endpoint**: Run `curl http://localhost:5000/api/categories` and check that it returns the category JSON list.
 - [ ] **Upload Flow**: In the UI, select category `LMS` and upload a test PDF. Check:
-    - [ ] Drive upload goes to correct parent folder.
+    - [ ] Target upload goes to correct destination folder.
     - [ ] Vector metadata in Pinecone is tagged with `"category": "lms"`.
     - [ ] `resource_files` collection logs status as `completed`.
 - [ ] **Chat Filtering Test**:
@@ -176,4 +176,4 @@ A seed script must populate initial category configurations.
     - [ ] Upload a LOS file saying "The password is LOS_rules".
     - [ ] Set Category Filter to `LMS` in ChatBox. Query: "What is the password?".
     - [ ] Verify response matches context from LMS only, and no document hit is logged for LOS.
-- [ ] **Branding Check**: Perform case-insensitive global text scan on the UI to confirm no traces of "Sigma" remain.
+- [ ] **Branding Check**: Perform case-insensitive global text scan on the UI to confirm no legacy brand references remain.

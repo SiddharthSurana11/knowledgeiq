@@ -1,6 +1,6 @@
 # KnowledgeIQ Quality Engines: Architectural Design
 
-This document details the design for adding the **Duplicate Detection**, **Contradiction Detection**, **Trust Score**, and **Knowledge Health Dashboard** engines to the KnowledgeIQ platform, maximizing code reuse from the original Sigma RAG architecture.
+This document details the design for adding the **Duplicate Detection**, **Contradiction Detection**, **Trust Score**, and **Knowledge Health Dashboard** engines to the KnowledgeIQ platform, maximizing code reuse from the original prototype architecture.
 
 ---
 
