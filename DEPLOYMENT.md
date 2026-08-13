@@ -10,7 +10,7 @@ KnowledgeIQ is packaged as a 5-container architecture (`docker-compose.yml`):
 1. **Frontend**: Static React/Vite SPA served via Nginx on port 80/5173.
 2. **API Gateway**: Node.js REST API & business orchestrator on port 5000.
 3. **Embedding Service**: Python gRPC service for document preprocessing, chunking, PyTorch embeddings, SpaCy parsing, and Neural Cross-Encoder Reranking on port 50052.
-4. **LLM Service**: Python gRPC service for LLM Provider Failover (Groq -> Gemini -> OpenRouter -> Claude) and Query Rewriting on port 50053.
+4. **LLM Service**: Python gRPC service for LLM Provider Failover (Groq → Gemini → OpenRouter) and Query Rewriting on port 50053.
 5. **MinIO**: Local S3-compatible raw document storage on ports 9000 & 9001.
 
 ### 🌐 Cloud Platform Evaluation (August 2026 Status)
@@ -94,11 +94,10 @@ Because Railway and Render do not run a single `docker-compose.yml` file out of 
 - **Port**: `50053` (gRPC)
 - **Environment Variables**:
   - `LLM_GRPC_HOST=0.0.0.0:50053`
-  - `LLM_PROVIDER_ORDER=groq,gemini,openrouter,claude`
+  - `LLM_PROVIDER_ORDER=groq,gemini,openrouter`
   - `GROQ_API_KEY=<your_groq_key>`
   - `GEMINI_API_KEY=<your_gemini_key>`
   - `OPENROUTER_API_KEY=<your_openrouter_key>`
-  - `ANTHROPIC_API_KEY=<your_anthropic_key>`
   - `MONGODB_URI=<your_mongodb_atlas_uri>`
   - `MONGODB_DB=knowledgeiq`
 
@@ -114,5 +113,5 @@ Because Railway and Render do not run a single `docker-compose.yml` file out of 
 
 1. **Authentication**: Set `AUTH_ENABLED=true` and supply a strong random `JWT_SECRET`.
 2. **CORS Origins**: Set `CORS_TRUSTED_ORIGINS=https://<your-frontend-domain>` in API Gateway configuration.
-3. **Database Security**: Ensure MongoDB Atlas IP Access List strictly allows your production deployment server IPs.
+3. **MongoDB Atlas Network Access**: Configure Network Access in the MongoDB Atlas dashboard to whitelist your production server/cloud IPs (or `0.0.0.0/0` for dynamic PaaS hosts like Railway or Render) so inbound service connections can authenticate successfully.
 4. **MinIO Credentials**: Replace default `minioadmin`/`minioadmin` with strong generated credentials before public exposure.

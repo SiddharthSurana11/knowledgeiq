@@ -1,6 +1,40 @@
-# KnowledgeIQ — Enterprise Document Intelligence & RAG Governance Platform
+<p align="center">
+  <img src="apps/frontend_reactjs/src/assets/transparent_bg_wolf_2.png" width="160" alt="KnowledgeIQ Logo" />
+</p>
 
-**KnowledgeIQ** is an enterprise-grade Retrieval-Augmented Generation (RAG) platform designed for highly reliable, grounded document intelligence across corporate policies, guidelines, and compliance documentation. Built with a 2-stage neural retrieval architecture (Pinecone Dense Vector + Sparse BM25 with Reciprocal Rank Fusion, followed by Cross-Encoder neural reranking), KnowledgeIQ features an automated pre-retrieval LLM Query Rewriter, real-time hallucination refusal guards, document trust scoring (0–100), duplicate upload detection (MinHash LSH), async contradiction detection queues, and a comprehensive governance analytics dashboard.
+<h1 align="center">KnowledgeIQ</h1>
+
+<p align="center">
+  <b>Enterprise Document Intelligence & Governance Platform</b><br />
+  Retrieval-Augmented Generation (RAG) with Hybrid RRF Search, 3-Level Duplicate Detection, and Automated Governance
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Node.js-v18%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/React-v18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Pinecone-Vector_DB-000000?style=for-the-badge&logo=pinecone&logoColor=white" alt="Pinecone" />
+  <img src="https://img.shields.io/badge/MongoDB-Atlas_Cloud-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" />
+</p>
+
+---
+
+## 🎯 Business Problem & Product Vision
+
+In modern enterprises, critical knowledge is frequently fragmented across disconnected repositories, legacy shared drives, and unstructured documents. Teams encounter four major operational bottlenecks:
+
+1. **Unreliable Naive Search**: Standard keyword search and basic vector RAG often return ungrounded, confident-sounding hallucinations when querying complex multi-turn or implicit questions.
+2. **Document Duplication**: Multiple versions of identical or near-identical policies (e.g., benefits updates, compliance procedures) accumulate without central version control.
+3. **Contradictory Documentation**: Superseded policies conflict with active guidelines, confusing team members and creating compliance risks.
+4. **Information Decay**: Documents age without designated owners or review schedules, resulting in outdated guidance persisting in active search indices.
+
+**KnowledgeIQ** solves these challenges by combining a 2-stage neural retrieval architecture with proactive document governance:
+- **Hybrid Retrieval & Reranking**: Merges Pinecone dense vector embeddings with sparse BM25 lexical search using Reciprocal Rank Fusion (RRF constant $k=60$) and Cross-Encoder neural reranking for high precision (100% Recall@5).
+- **Pre-Retrieval LLM Query Rewriter**: Resolves multi-turn conversational context and implicit pronouns before query execution, operating with a fail-open timeout guard.
+- **Hallucination Refusal Guard**: Evaluates response grounding against retrieved context, issuing polite refusals when facts are absent.
+- **Automated Document Governance**: Features a 3-level duplicate detection engine (SHA-256 exact match, Pinecone vector similarity $\ge 96\%$, chunk-overlap ratio $> 70\%$), asynchronous contradiction detection workers, trust scoring (0–100), and an administrative governance dashboard.
 
 ---
 
@@ -16,27 +50,49 @@ Once initialized, open your browser to **`http://localhost:5173`** to access the
 
 ---
 
+## 📂 Repository Structure
+
+```
+knowledgeiq-platform/
+├── apps/
+│   ├── api-gateway/            # Express REST API, Auth, Rate Limiting & RRF Hybrid Search
+│   ├── embedding-service/      # PyTorch Embeddings, OCR, SpaCy Parsing & Neural Reranker
+│   ├── llm-service/            # LLM 3-Tier Failover Chain (Groq → Gemini → OpenRouter) & Query Rewriter
+│   └── frontend_reactjs/       # React 18 / Vite SPA with Matte Dark Theme & Governance Views
+├── docs/                       # Architectural Specifications, ADRs & Phase Changelogs
+│   └── adr/                    # Formal Architecture Decision Records (001, 002, 003)
+├── eval/                       # RAG Evaluation Suite (run_eval.py & gold_set.json)
+├── protos/                     # gRPC Protobuf Interfaces (embedding_service.proto, llm_service.proto)
+├── docker-compose.yml          # Production 5-Container Docker Stack Definition
+├── DEPLOYMENT.md               # Cloud PaaS & VM Hosting Guide
+├── LICENSE                     # Standard MIT Open Source License
+├── README.md                   # Primary Repository Documentation Index
+└── start-dev.ps1               # Local Non-Docker Development PowerShell Runner
+```
+
+---
+
 ## 🏛️ System Architecture
 
 ```
-                               ┌─────────────────────────────┐
-                               │     React / Vite SPA        │
-                               │  (Dark Theme Workspace UI)  │
-                               └──────────────┬──────────────┘
-                                              │ HTTP / REST
-                                              ▼
-                               ┌─────────────────────────────┐
-                               │   API Gateway (Node.js)     │
-                               │  Auth, Rate-Limit, Tracing  │
-                               └──────┬───────────────┬──────┘
-                                      │               │
-                       gRPC (50052)   │               │   gRPC (50053)
-              ┌───────────────────────┘               └───────────────────────┐
-              ▼                                                               ▼
+                                ┌─────────────────────────────┐
+                                │     React / Vite SPA        │
+                                │  (Dark Theme Workspace UI)  │
+                                └──────────────┬──────────────┘
+                                               │ HTTP / REST
+                                               ▼
+                                ┌─────────────────────────────┐
+                                │   API Gateway (Node.js)     │
+                                │  Auth, Rate-Limit, Tracing  │
+                                └──────┬───────────────┬──────┘
+                                       │               │
+                        gRPC (50052)   │               │   gRPC (50053)
+               ┌───────────────────────┘               └───────────────────────┐
+               ▼                                                               ▼
 ┌───────────────────────────┐                                   ┌───────────────────────────┐
 │ Embedding Service (Python)│                                   │ LLM Failover (Python)     │
 │ PyTorch, SpaCy Parsing,   │                                   │ Query Rewriter, Groq,     │
-│ Cross-Encoder Reranker    │                                   │ Gemini, OpenRouter, Claude│
+│ Cross-Encoder Reranker    │                                   │ Gemini, OpenRouter        │
 └─────────────┬─────────────┘                                   └───────────────────────────┘
               │
               ├──────────────────────┬──────────────────────┐
@@ -81,10 +137,12 @@ Retrieval accuracy and hallucination safety are continuously validated using an 
 ## ⚠️ Known Limitations & Operational Tradeoffs
 
 1. **Free-Tier Provider Rate Limits & Failover Latency**:
-   - The LLM service implements a 4-tier provider failover chain (Groq -> Gemini -> OpenRouter -> Claude). Under heavy load or free-tier API rate limits (HTTP 429), failover transitions add latency to chat requests while waiting for secondary providers.
-2. **Query Rewriting Latency & Quota Tradeoff**:
+   - The LLM service implements a 3-tier provider failover chain (Groq → Gemini → OpenRouter). Under heavy load or free-tier API rate limits (HTTP 429), failover transitions add latency to chat requests while waiting for secondary providers.
+2. **MongoDB Atlas Network Access (IP Access List Requirement)**:
+   - KnowledgeIQ relies on MongoDB Atlas for document metadata, governance issues, and feedback persistence. When deploying to cloud environments (e.g. Railway, Render, Oracle Cloud VM), you must configure MongoDB Atlas Network Access to whitelist your server IP address (or `0.0.0.0/0` for dynamic PaaS hosts) to allow inbound database connections.
+3. **Query Rewriting Latency & Quota Tradeoff**:
    - The pre-retrieval query rewriting step adds **1 additional LLM API call** per chat request to resolve multi-turn context. While wrapped in a fail-open 3.5s timeout, this introduces a minor latency overhead (~700ms–1.5s) and consumes provider token quota.
-3. **Fixed Token Sliding-Window Chunking**:
+4. **Fixed Token Sliding-Window Chunking**:
    - Documents are currently split using `tiktoken` sliding token windows (800 tokens / 100 overlap). While sentence boundary detection prevents chopping words, topic shifts mid-chunk are bounded by fixed token counts rather than AST/semantic section breaks.
 
 ---
@@ -131,6 +189,16 @@ Run the convenience script to launch all 4 application services in separate term
 
 ---
 
+## 👤 Author
+
+**Siddharth Surana**<br />
+Quantitative Computing & Software Systems Engineering<br />
+GitHub: [@SiddharthSurana11](https://github.com/SiddharthSurana11)
+
+---
+
 ## 📄 License & Project Documentation
 
-For deep technical specifications, past phase changelogs, and security rotation checklists, refer to the **[KnowledgeIQ Master Project History Index](docs/PROJECT_HISTORY.md)** and **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+KnowledgeIQ is released under the **[MIT License](LICENSE)**. For technical specifications, changelogs, and cloud deployment guides, refer to:
+- **[KnowledgeIQ Master Project History Index](docs/PROJECT_HISTORY.md)**
+- **[Production Deployment & PaaS Guide](DEPLOYMENT.md)**
