@@ -196,6 +196,8 @@ router.post('/', validate(schemas.chatSchema), async (req, res, next) => {
       isRewritten,
       rewriteLatency,
       category: category || 'all',
+      scope: scope || 'global',
+      documentId: resolvedDocId || null,
       sessionId: req.body.sessionId || userId || null,
       timestamp: new Date(),
       resultsReturned: chunks.length,
