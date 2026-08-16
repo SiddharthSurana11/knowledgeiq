@@ -183,11 +183,29 @@ Run the convenience script to launch all 4 application services in separate term
 
 *The KnowledgeIQ UI features a sleek matte dark theme (`#0A0A0B`), wolf brand mark, slate avatar chips, and integrated workspace footer.*
 
-- `[SCREENSHOT: KnowledgeIQ Dark Theme Workspace Chat Interface]`
-- `[SCREENSHOT: Document Sources & Trust Score Breakdown Panel]`
-- `[SCREENSHOT: Governance & Search Analytics Dashboard]`
-- `[SCREENSHOT: Knowledge Health & Contradiction Detection View]`
-- `[SCREENSHOT: Document Upload & Metadata Category Tagging Panel]`
+### 1. Enterprise Workspace Chat Interface
+![Workspace Chat Interface](docs/screenshots/01-workspace-chat-interface.png)
+
+### 2. Multi-Chunk Sources & Trust Score Breakdown
+![Sources & Trust Score Breakdown](docs/screenshots/02-sources-trust-breakdown.png)
+
+### 3. Real-Time Governance Overview
+![Governance Overview](docs/screenshots/03-governance-overview.png)
+
+### 4. Knowledge Health & Contradiction Pipeline Status
+![Knowledge Health](docs/screenshots/04-knowledge-health.png)
+
+### 5. Enterprise Search & Query Performance Analytics
+![Enterprise Analytics](docs/screenshots/05-enterprise-analytics.png)
+
+### 6. Scope Selection (Global vs Document Scope)
+![Scope Selection Dropdown](docs/screenshots/06-scope-selection.png)
+
+### 7. Document Category Tagging
+![Document Category Tagging](docs/screenshots/07-category-selection.png)
+
+### 8. Document Upload & Ingestion Pipeline Progress
+![Ingestion Pipeline Progress](docs/screenshots/08-ingestion-pipeline.png)
 
 ---
 
