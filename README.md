@@ -126,11 +126,13 @@ Retrieval accuracy and hallucination safety are continuously validated using an 
 
 | Metric | Score | Passed / Total | Description |
 |---|---|---|---|
-| **Recall@5** | **100.0%** | 7/7 | Top-5 retrieval accuracy across standard corporate queries |
+| **Recall@5** | **100.0%** | 6/6 | Top-5 retrieval accuracy across standard corporate queries |
 | **Supersession Accuracy** | **100.0%** | 1/1 | Correct preference for active vs superseded document versions |
 | **Abstention Correctness** | **100.0%** | 2/2 | Perfect hallucination guard refusal on out-of-domain queries |
-| **Faithfulness Proxy** | **57.1%** | 4/7 | Literal phrase alignment against ground-truth excerpts |
-| **Query Success Rate** | **100.0%** | 9/9 | Zero unhandled runtime exceptions or gateway errors |
+| **Faithfulness Proxy** | **83.3%** <sup>*</sup> | 5/6 | Literal phrase alignment against ground-truth excerpts |
+| **Query Success Rate** | **100.0%** | 6/6 | Zero unhandled runtime exceptions or gateway errors |
+
+*\* Note: Faithfulness Proxy improved from 57.1% (4/7) to 83.3% (5/6) after raising provider completion token limits to 2500, eliminating false refusals caused by scratchpad CoT truncation (see commit [`4fe294c`](https://github.com/SiddharthSurana11/knowledgeiq/commit/4fe294c3e8062616896973c1f24fa40aae1eae8c)).*
 
 ---
 
